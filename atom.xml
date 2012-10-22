@@ -1,16 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My FIRST Octopress Blog]]></title>
+  <title><![CDATA[code related ramblings]]></title>
   <link href="http://jvenator.github.com/atom.xml" rel="self"/>
   <link href="http://jvenator.github.com/"/>
-  <updated>2012-10-03T15:51:27-04:00</updated>
+  <updated>2012-10-22T09:42:04-04:00</updated>
   <id>http://jvenator.github.com/</id>
   <author>
-    <name><![CDATA[Your Name]]></name>
+    <name><![CDATA[Joseph]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Knowing Rails Doesn't Mean You Know Ruby: Part 1 | attr_accessor]]></title>
+    <link href="http://jvenator.github.com/blog/2012/10/18/attr-accessor-in-ruby-for-dummies/"/>
+    <updated>2012-10-18T20:48:00-04:00</updated>
+    <id>http://jvenator.github.com/blog/2012/10/18/attr-accessor-in-ruby-for-dummies</id>
+    <content type="html"><![CDATA[<p>The <a href="http://en.wikipedia.org/wiki/Ruby_(programming_language">Ruby</a>) community was a small one for nearly a decade after its creation in 1995 by <a href="http://en.wikipedia.org/wiki/Yukihiro_Matsumoto">Yukihiro &#8220;Matz&#8221; Matsumoto</a>, until the the <a href="http://en.wikipedia.org/wiki/Ruby_on_Rails">Ruby on Rails</a> framework was created in 2004 by <a href="http://en.wikipedia.org/wiki/David_Heinemeier_Hansson">David Heinemeier Hansson</a>. Rails&#8217; increasing reputation as the go-to option for rapid prototyping and deployment among fast moving and agile startups, dev shops and internal teams of larger companies has led to exponential growth in both the Ruby and Rails communities.</p>
+
+<p>For better or worse, many people have come to Ruby by way of Rails. It is not uncommon for people new to Rails, especially those that are new to programming in general, to have little or no experience with Ruby as a standalone programming language. While initially these individuals will make encouraging and tangible progress, it quickly plateau&#8217;s, not only in terms of their ability to build within the Rails framework, but also in terms of their ability to interact with and learn from more experienced programmers and the online community at large. These are things I&#8217;ve experienced in my own efforts to become a competent and productive programmer, and have witnessed in the journeys of many others on similar paths. This series of posts will attempt to share some of the lessons I&#8217;ve learned that may be helpful to others in a similar position.</p>
+
+<p>Without further ado I introduce to you <strong>attr_accessor</strong>, a <em>setter</em> and <em>getter</em> method for classes in Ruby. First let&#8217;s look at a basic scenario you might encounter in a Rails app. Here I&#8217;m creating both a model and a controller for a <em>Dog</em> class, which will have several attributes such as <em>name</em>, <em>age</em> and <em>breed</em>. You can assume a migration was created that added these fields to the Dog class. It is common practice to use <code>attr_accessible</code> to allow for mass-assignment of the various attribute values. For simplicity I&#8217;m only including a <em>show</em> method in the controller and setting the @dog instance variable by searching for a specific dog record using it&#8217;s id value.</p>
+
+<figure class='code'><figcaption><span>Dog model - dog.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="k">class</span> <span class="nc">Dogs</span>
+</span><span class='line'>  <span class="n">attr_accessible</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:age</span><span class="p">,</span> <span class="ss">:breed</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Dog controlloer - dogs_controller.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="k">class</span> <span class="nc">DogsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">def</span> <span class="nf">show</span>
+</span><span class='line'>      <span class="vi">@dog</span> <span class="o">=</span> <span class="no">Dogs</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:id</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you&#8217;d expect, if I wanted to now make a call for this particular age or breed in a &#8216;show&#8217; page, I might do something like this.</p>
+
+<figure class='code'><figcaption><span>Dog show view - show.html.erb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='erb'><span class='line'><span class="x">&lt;h1&gt;</span><span class="cp">&lt;%=</span> <span class="vi">@dog</span><span class="o">.</span><span class="n">name</span> <span class="cp">%&gt;</span><span class="x">&lt;/h1&gt;</span>
+</span><span class='line'><span class="x">&lt;p&gt;Age: </span><span class="cp">&lt;%=</span> <span class="vi">@dog</span><span class="o">.</span><span class="n">age</span> <span class="cp">%&gt;</span><span class="x">&lt;/p&gt;</span>
+</span><span class='line'><span class="x">&lt;p&gt;Breed: </span><span class="cp">&lt;%=</span> <span class="vi">@dog</span><span class="o">.</span><span class="n">breed</span> <span class="cp">%&gt;</span><span class="x">&lt;/p&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This view snippet where we are able to so simply reference the @dog instance variable and then tack on the desired attributes (i.e., age, breed, etc.) is something I always took for granted. In fact it never occurred to me that in this example the name, age and breed attributes are actually acting as methods. Consider a few well know string methods that I&#8217;ve run here within IRB in the console (using Terminal since I&#8217;m on a Mac).</p>
+
+<p><img src="http://f.cl.ly/items/1g3P2x0V0s0l3a1x3E1h/Screen%20Shot%202012-10-22%20at%201.56.24%20AM.png"></p>
+
+<p>Here, there&#8217;s no question that <em>upcase</em> and <em>reverse</em> are methods within the Ruby library that perform certain functions on strings. Looking at this syntax and comparing it to our original example of a Dog class, it becomes apparent that when calling something like <code>@dog.name</code> that <em>name</em> is really a method of some sort that returns the stored value for the <em>name</em> attribute.</p>
+
+<p>The hero responsible for this behind-the-scenes magic is <code>attr_accessor</code>, which automatically provides <em>setter</em> and <em>getter</em> methods for attributes that are passed to it. Since Rails performs things like this in the background, let&#8217;s try it in pure Ruby. Like before we&#8217;re going to create a Dog class and give it certain attributes, only there won&#8217;t be a controller. It can look something like this.</p>
+
+<figure class='code'><figcaption><span>Ruby only Dog class dog.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="k">class</span> <span class="nc">Dog</span>
+</span><span class='line'>  <span class="kp">attr_accessor</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:age</span><span class="p">,</span> <span class="ss">:breed</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If I load this simple three lines of code into IRB, I can actually do a lot. You can load a file into IRB calling <code>irb</code> in your console, and then passing it this command <code>load '/directory/location/file_name'</code>. In my case I ran <code>load '~/Desktop/Dog.rb'</code>.</p>
+
+<p><img src="http://f.cl.ly/items/0W1s0d2k05051B400D30/Screen%20Shot%202012-10-22%20at%202.24.12%20AM.png"></p>
+
+<p>You can see that I was able to make a new instance of the Dog class, and then easily assign (<em>set</em>) the values of the attributes as well as call (<em>get</em>) them. Now I&#8217;d like to show you what <code>attr_accessor</code> is actually doing behind the scenes.</p>
+
+<figure class='code'><figcaption><span>Ruby Dog class long-form dog.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="k">class</span> <span class="nc">Dog</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span><span class="o">=</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>  <span class="c1"># setter method for :name</span>
+</span><span class='line'>      <span class="vi">@name</span> <span class="o">=</span> <span class="n">string</span>   <span class="c1"># this sets the instance variable of :name equal to the string provided</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>  <span class="c1"># getter method for :name</span>
+</span><span class='line'>      <span class="vi">@name</span>   <span class="c1"># this allow you to call the name method and get back the assigned value of :name</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">age</span><span class="o">=</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>  <span class="c1"># setter method for :age</span>
+</span><span class='line'>      <span class="vi">@age</span> <span class="o">=</span> <span class="n">number</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">age</span>  <span class="c1"># getter method for :age</span>
+</span><span class='line'>      <span class="vi">@age</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">breed</span><span class="o">=</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@breed</span> <span class="o">=</span> <span class="n">string</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">breed</span>
+</span><span class='line'>      <span class="vi">@breed</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&#8217;s look at the <em>setter</em> method for the <em>name</em> attribute on line 3. This allows us to create an instance of the Dog class, and then set the <em>name</em> attribute equal to a string we pass to it. This is exactly what I did in the prior screenshot of my console in IRB when I typed <code>d.name = "fido"</code>. Next we see on line 7 that we are defining a <code>name</code> method that can be called and will spit out the attribute value we stored in the <code>@name</code> instance variable. Again you can see this working the IRB screenshot above when typed in <code>d.name</code> and it spit out <em>&#8220;fido&#8221;</em>. So, what <code>attr_accessor</code> does behind the scenes in Ruby (even more behind the scenes in Rails) is dynamically create these two methods (<em>setter</em> and <em>getter</em>) for each of the class attributes you pass to it. It&#8217;s worth noting that aside from the consistency and likely avoidance of typos in your code it also saves you six lines of code for every single class attribute you have (that&#8217;s 18 lines of code in our simple Dog class example).</p>
+
+<p>You might ask why this matters, since it&#8217;s remains pretty easy to just keep using <code>attr_accessor</code>? The main reason relates to my comments in the first paragraph. Basically, it&#8217;s about stretching your boundaries a little bit, and understanding what&#8217;s happening underneath the covers both in Ruby and in Rails. While I will continue to make use of the magic in Rails and <code>attr_accessor</code> in Ruby, knowing how it works has helped me appreciate things more.</p>
+
+<p>For starters, I&#8217;ve now been introduced to the <em>setter</em> and <em>getter</em> pattern, which is a fundamental concept in almost every programming language or framework in use today. This means that when I decide to learn other languages or frameworks, or a more experienced programmer references it when offering me assistance, I&#8217;ll know what the hell they&#8217;re talking about! There&#8217;s a long list of additional reasons to learn this I&#8217;m sure, but if you&#8217;re even halfway serious about learning to code in a competent manner then the one I&#8217;ve provided should probably be enough.</p>
+
+<p>Let me know in the comments if any of this doesn&#8217;t make sense, or if you have any real world examples of where understanding what <code>attr_accessor</code> and/or the <em>setter/getter</em> pattern is doing has helped you.</p>
+]]></content>
+  </entry>
   
 </feed>
